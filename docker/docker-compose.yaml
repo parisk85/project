@@ -1,0 +1,28 @@
+# docker-compose.yaml
+version: "3.8"
+services:
+  jenkins:
+    image: jenkins/jenkins:lts
+    privileged: true
+    user: root
+    ports:
+      - 8085:8080
+      - 50000:50000
+    container_name: jenkins
+    volumes:
+      - /home/parisk85/jenkins_compose/jenkins_configuration:/var/jenkins_home
+      - /var/run/docker.sock:/var/run/docker.sock
+  localstack:
+    container_name: "${LOCALSTACK_DOCKER_NAME-localstack}"
+    image: localstack/localstack
+    ports:
+      - "127.0.0.1:4566:4566"            # LocalStack Gateway
+      - "127.0.0.1:4510-4559:4510-4559"  # external services port range
+    environment:
+      - DEBUG=debug
+      - PERSISTENCE=true
+      - LAMBDA_EXECUTOR=docker-reuse
+      - DOCKER_HOST=unix:///var/run/docker.sock
+    volumes:
+      - /var/lib/localstack:/var/lib/localstack
+      - /var/run/docker.sock:/var/run/docker.sock
